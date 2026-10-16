@@ -19,7 +19,9 @@ export interface StatusResponse {
   providedIn: 'root'
 })
 export class WhatsappService {
-  private apiUrl = 'http://localhost:3000/api';
+  private apiUrl = typeof window !== 'undefined' && (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1')
+    ? 'http://localhost:3000/api'
+    : 'http://5yjqmd7ilzmip5esk9v1trrc.93.127.212.65.sslip.io/api';
 
   constructor(private http: HttpClient) {}
 
