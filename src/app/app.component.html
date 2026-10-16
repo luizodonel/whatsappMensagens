@@ -1,0 +1,70 @@
+﻿<div class="glass-panel">
+  <h1>WhatsApp Sender Pro</h1>
+  
+  <div class="status-badge" [ngClass]="status.connected ? 'status-connected' : 'status-disconnected'">
+    <div class="status-indicator"></div>
+    {{ status.connected ? 'Conectado e Pronto' : 'Desconectado' }}
+  </div>
+
+  <ng-container *ngIf="!status.connected">
+    <div class="qr-container">
+      <h3>Conecte seu WhatsApp</h3>
+      <p style="color: var(--text-muted); text-align: center; font-size: 0.875rem;">
+        Abra o WhatsApp no seu celular, vá em Aparelhos Conectados e escaneie o código abaixo.
+      </p>
+      
+      <div class="qr-placeholder">
+        <img *ngIf="status.qrCode" [src]="getQrCodeUrl()" alt="QR Code" width="200" height="200">
+        <div *ngIf="!status.qrCode" class="spinner"></div>
+      </div>
+    </div>
+  </ng-container>
+
+  <ng-container *ngIf="status.connected">
+    <!-- Progress Indicator -->
+    <div *ngIf="status.campaign.inProgress" style="margin-bottom: 2rem;">
+      <h3>Progresso do Envio</h3>
+      <div class="progress-bar-container">
+        <div class="progress-bar-fill" [style.width.%]="(status.campaign.sent / status.campaign.total) * 100"></div>
+      </div>
+      <div class="progress-stats">
+        <span>Enviados: {{status.campaign.sent}} de {{status.campaign.total}}</span>
+        <span>Enviando para: {{status.campaign.currentNumber}}</span>
+      </div>
+    </div>
+
+    <!-- Form -->
+    <form (submit)="sendCampaign(); $event.preventDefault();" *ngIf="!status.campaign.inProgress">
+      <div class="form-group">
+        <label>1. Selecione as Fotos (Opcional)</label>
+        <div style="display: flex; gap: 10px; align-items: center; margin-bottom: 5px;">
+          <input type="file" accept="image/*" multiple (change)="onFileSelected($event)" #fileInput>
+          <button type="button" *ngIf="selectedFiles.length > 0" (click)="clearFiles(fileInput)" style="padding: 4px 8px; font-size: 12px; background: #ef4444; border: none; border-radius: 4px; color: white; cursor: pointer;">Limpar</button>
+        </div>
+        <div *ngIf="selectedFiles.length > 0" style="color: var(--primary);">
+          <small>{{ selectedFiles.length }} arquivo(s) selecionado(s)</small>
+        </div>
+        <small style="color: var(--text-muted); display: block; margin-top: 4px;">
+          Dica: Você pode selecionar várias imagens de uma vez ou ir adicionando uma por vez.
+        </small>
+      </div>
+
+      <div class="form-group">
+        <label>2. Mensagens (Automáticas)</label>
+        <div style="padding: 15px; background: rgba(16, 185, 129, 0.1); border: 1px solid var(--primary); border-radius: 8px; color: var(--primary);">
+          <strong>Modo Anti-Spam Ativo:</strong><br>
+          O sistema está configurado para alternar automaticamente entre 6 mensagens diferentes de forma sequencial para evitar bloqueios.
+        </div>
+      </div>
+
+      <button type="submit" class="btn" [disabled]="sending">
+        <ng-container *ngIf="!sending">
+          <span>🚀</span> Iniciar Disparos (292 contatos)
+        </ng-container>
+        <ng-container *ngIf="sending">
+          <div class="spinner" style="border-top-color: white;"></div> Iniciando...
+        </ng-container>
+      </button>
+    </form>
+  </ng-container>
+</div>
