@@ -34,4 +34,8 @@ export class WhatsappService {
   sendCampaign(formData: FormData): Observable<any> {
     return this.http.post(`${this.apiUrl}/send`, formData);
   }
+
+  retryConnection(): Observable<any> {
+    return this.http.get(`${this.apiUrl}/retry`);
+  }
 }

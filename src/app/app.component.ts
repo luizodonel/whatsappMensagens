@@ -48,12 +48,30 @@ export class AppComponent implements OnInit, OnDestroy {
     }
   }
 
+  retrying: boolean = false;
+
   checkStatus() {
     this.waService.getStatus().subscribe({
       next: (res) => {
         this.status = res;
       },
       error: (err) => console.error('Failed to get status', err)
+    });
+  }
+
+  retryConnection() {
+    this.retrying = true;
+    this.waService.retryConnection().subscribe({
+      next: () => {
+        setTimeout(() => {
+          this.retrying = false;
+        }, 4000);
+        this.checkStatus();
+      },
+      error: (err) => {
+        console.error('Falha ao tentar reconectar:', err);
+        this.retrying = false;
+      }
     });
   }
 
