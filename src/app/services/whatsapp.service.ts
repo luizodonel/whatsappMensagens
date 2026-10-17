@@ -11,6 +11,8 @@ export interface CampaignProgress {
 
 export interface StatusResponse {
   connected: boolean;
+  authenticated?: boolean;
+  loadingPercent?: number | null;
   qrCode: string | null;
   campaign: CampaignProgress;
 }

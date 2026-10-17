@@ -185,6 +185,11 @@ input[type="file"]::file-selector-button:hover {
   box-shadow: 0 0 8px var(--primary);
 }
 
+.status-connecting .status-indicator {
+  background-color: #38bdf8;
+  box-shadow: 0 0 8px #38bdf8;
+}
+
 .status-disconnected .status-indicator {
   background-color: var(--danger);
   box-shadow: 0 0 8px var(--danger);

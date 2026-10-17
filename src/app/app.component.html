@@ -1,21 +1,36 @@
-﻿<div class="glass-panel">
+<div class="glass-panel">
   <h1>WhatsApp Envio Corporativo</h1>
 
-  <div class="status-badge" [ngClass]="status.connected ? 'status-connected' : 'status-disconnected'">
+  <div class="status-badge" [ngClass]="status.connected ? 'status-connected' : (status.authenticated ? 'status-connecting' : 'status-disconnected')">
     <div class="status-indicator"></div>
-    {{ status.connected ? 'Conectado e Pronto' : 'Desconectado' }}
+    {{ status.connected ? 'Conectado e Pronto' : (status.authenticated ? 'Sincronizando com Celular...' : 'Desconectado') }}
   </div>
 
   <ng-container *ngIf="!status.connected">
     <div class="qr-container">
-      <h3>Conecte seu WhatsApp</h3>
-      <p style="color: var(--text-muted); text-align: center; font-size: 0.875rem;">
-        Abra o WhatsApp no seu celular, vá em Aparelhos Conectados e escaneie o código abaixo.
-      </p>
+      <!-- Estado de Autenticação / Sincronização em andamento -->
+      <div *ngIf="status.authenticated || (!status.qrCode && status.loadingPercent !== null && status.loadingPercent !== undefined)" style="text-align: center; padding: 1.5rem 0.5rem;">
+        <div class="spinner" style="width: 48px; height: 48px; margin: 0 auto 1.5rem; border-width: 4px; border-top-color: var(--primary);"></div>
+        <h3 style="color: var(--primary); margin-bottom: 0.5rem; font-size: 1.25rem;">WhatsApp Conectado!</h3>
+        <p style="color: var(--text-muted); font-size: 0.95rem; margin-bottom: 0.75rem;">
+          Sincronizando conversas e contatos com o seu aparelho...
+        </p>
+        <span *ngIf="status.loadingPercent !== null && status.loadingPercent !== undefined" style="display: inline-block; padding: 4px 14px; background: rgba(56, 189, 248, 0.15); color: #38bdf8; border-radius: 9999px; font-weight: 600; font-size: 0.85rem;">
+          Carregamento: {{ status.loadingPercent }}%
+        </span>
+      </div>
 
-      <div class="qr-placeholder">
-        <img *ngIf="status.qrCode" [src]="getQrCodeUrl()" alt="QR Code" width="200" height="200">
-        <div *ngIf="!status.qrCode" class="spinner"></div>
+      <!-- Exibição do QR Code quando ainda não escaneado -->
+      <div *ngIf="!status.authenticated && (!status.loadingPercent || status.loadingPercent === 0)" style="width: 100%; display: flex; flex-direction: column; align-items: center; gap: 1rem;">
+        <h3>Conecte seu WhatsApp</h3>
+        <p style="color: var(--text-muted); text-align: center; font-size: 0.875rem;">
+          Abra o WhatsApp no seu celular, vá em Aparelhos Conectados e escaneie o código abaixo.
+        </p>
+
+        <div class="qr-placeholder">
+          <img *ngIf="status.qrCode" [src]="getQrCodeUrl()" alt="QR Code" width="200" height="200">
+          <div *ngIf="!status.qrCode" class="spinner"></div>
+        </div>
       </div>
     </div>
   </ng-container>
