@@ -23,7 +23,7 @@ export interface StatusResponse {
 export class WhatsappService {
   private apiUrl = typeof window !== 'undefined' && (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1')
     ? 'http://localhost:3000/api'
-    : 'https://whatsappapi.luizodonel.cloud/api';
+    : 'https://enviosmsgapi.luizodonel.cloud/api';
 
   constructor(private http: HttpClient) {}
 
