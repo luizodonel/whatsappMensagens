@@ -48,8 +48,8 @@
       </div>
     </div>
 
-    <!-- Form -->
-    <form (submit)="sendCampaign(); $event.preventDefault();" *ngIf="!status.campaign.inProgress">
+    <!-- Form Container -->
+    <div *ngIf="!status.campaign.inProgress">
       <div class="form-group">
         <label>1. Selecione as Fotos (Opcional)</label>
         <div style="display: flex; gap: 10px; align-items: center; margin-bottom: 5px;">
@@ -66,23 +66,51 @@
       </div>
 
       <div class="form-group">
-        <label>2. Mensagens (Automáticas)</label>
-        <div
-          style="padding: 15px; background: rgba(16, 185, 129, 0.1); border: 1px solid var(--primary); border-radius: 8px; color: var(--primary);">
-          <strong>Modo Anti-Spam Ativo:</strong><br>
-          O sistema está configurado para alternar automaticamente entre 6 mensagens diferentes de forma sequencial para
-          evitar bloqueios.
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.5rem;">
+          <label style="margin-bottom: 0;">2. Números dos Destinatários</label>
+          <span *ngIf="parsedNumbers.length > 0" style="font-size: 0.75rem; background: rgba(0, 230, 118, 0.15); color: var(--primary); padding: 2px 8px; border-radius: 9999px; font-weight: 600;">
+            {{ parsedNumbers.length }} {{ parsedNumbers.length === 1 ? 'número' : 'números' }}
+          </span>
         </div>
+        <textarea
+          [(ngModel)]="numbers"
+          name="numbers"
+          rows="3"
+          placeholder="Ex: 61982261155, 61992305555"
+          style="min-height: 80px;"
+        ></textarea>
+        <small style="color: var(--text-muted); display: block; margin-top: 4px;">
+          Insira 1 ou vários números separados por vírgula. Ex: <strong>61982261155, 61992305555</strong>
+        </small>
       </div>
 
-      <button type="submit" class="btn" [disabled]="sending">
+      <div class="form-group">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.5rem;">
+          <label style="margin-bottom: 0;">3. Mensagem</label>
+          <span *ngIf="message.length > 0" style="font-size: 0.75rem; color: var(--text-muted);">
+            {{ message.length }} caractere(s)
+          </span>
+        </div>
+        <textarea
+          [(ngModel)]="message"
+          name="message"
+          rows="4"
+          placeholder="Digite a mensagem que deseja enviar..."
+          style="min-height: 100px;"
+        ></textarea>
+        <small *ngIf="selectedFiles.length > 0" style="color: var(--text-muted); display: block; margin-top: 4px;">
+          Com imagens selecionadas, a mensagem será enviada como legenda.
+        </small>
+      </div>
+
+      <button type="button" (click)="sendCampaign()" class="btn" [disabled]="sending || parsedNumbers.length === 0 || (!message.trim() && selectedFiles.length === 0)">
         <ng-container *ngIf="!sending">
-          <span>🚀</span> Iniciar Disparos (292 contatos)
+          <span>🚀</span> Enviar Mensagem {{ parsedNumbers.length > 0 ? ('(' + parsedNumbers.length + ' contato' + (parsedNumbers.length > 1 ? 's' : '') + ')') : '' }}
         </ng-container>
         <ng-container *ngIf="sending">
-          <div class="spinner" style="border-top-color: white;"></div> Iniciando...
+          <div class="spinner" style="border-top-color: white;"></div> Enviando...
         </ng-container>
       </button>
-    </form>
+    </div>
   </ng-container>
 </div>

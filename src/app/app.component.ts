@@ -17,22 +17,22 @@ export class AppComponent implements OnInit, OnDestroy {
     campaign: { total: 0, sent: 0, currentNumber: null, inProgress: false }
   };
   
-  description: string = `Ter consistência no Bac Bo não é sorte, é leitura de padrões e gerenciamento rigoroso de banca. Se você quer parar de adivinhar jogadas e começar a operar com estratégia, conheça a nossa ferramenta:
-✅ Zero Delay: Entradas em milissegundos para você nunca mais perder o tempo da mesa
-✅ Leitura Algorítmica Avançada: Análise contínua das últimas rodadas e tendências reais
-✅ Gerenciador de Metas Diárias: Calcule e acompanhe o progresso dos seus resultados dentro da própria plataforma
-Chega de arriscar no escuro tentando recuperar prejuízo por impulso.
-🌐 Entre na plataforma oficial:
-👉 https://www.sinaiscassino.com.br
-
-⚠️ Aviso Legal: Apostas não são investimentos. Jogue com responsabilidade. Proibido para menores de 18 anos.`;
-  link: string = 'https://www.sinaiscassino.com.br';
+  numbers: string = '';
+  message: string = '';
   selectedFiles: File[] = [];
   
   sending: boolean = false;
   private statusSub?: Subscription;
 
   constructor(private waService: WhatsappService) {}
+
+  get parsedNumbers(): string[] {
+    if (!this.numbers) return [];
+    return this.numbers
+      .split(/[,;\n\r]+/)
+      .map(n => n.trim())
+      .filter(n => n.length > 0);
+  }
 
   ngOnInit() {
     this.checkStatus();
@@ -74,7 +74,23 @@ Chega de arriscar no escuro tentando recuperar prejuízo por impulso.
     }
     
     if (this.status.campaign.inProgress) {
-      alert('Uma campanha já está em andamento!');
+      alert('Um envio já está em andamento!');
+      return;
+    }
+
+    const count = this.parsedNumbers.length;
+    if (count === 0) {
+      alert('Por favor, adicione pelo menos um número de telefone para enviar.');
+      return;
+    }
+
+    if (!this.message.trim() && this.selectedFiles.length === 0) {
+      alert('Por favor, digite uma mensagem ou selecione pelo menos uma imagem para enviar.');
+      return;
+    }
+
+    const confirmSend = confirm(`Deseja realmente iniciar o envio para ${count} número(s)?\n\nNenhuma mensagem é disparada sem o seu clique e confirmação.`);
+    if (!confirmSend) {
       return;
     }
 
@@ -83,24 +99,20 @@ Chega de arriscar no escuro tentando recuperar prejuízo por impulso.
     this.selectedFiles.forEach((file) => {
       formData.append('images', file);
     });
-    if (this.description) {
-      formData.append('description', this.description);
-    }
-    if (this.link) {
-      formData.append('link', this.link);
-    }
+    formData.append('numbers', this.numbers);
+    formData.append('message', this.message);
 
     this.waService.sendCampaign(formData).subscribe({
       next: (res) => {
         console.log(res);
         this.sending = false;
-        alert('Campanha iniciada com sucesso!');
+        alert(`Disparo iniciado com sucesso para ${count} contato(s)!`);
         this.checkStatus();
       },
       error: (err) => {
         console.error(err);
         this.sending = false;
-        alert('Erro ao iniciar a campanha: ' + (err.error?.error || err.message));
+        alert('Erro ao iniciar o envio: ' + (err.error?.error || err.message));
       }
     });
   }
